@@ -1,7 +1,11 @@
 #!/bin/sh
 
-if [ ! -d cgreen ]; then
+if [ ! -f cgreen/include/cgreen/cgreen.h ]; then
   git clone https://github.com/cgreen-devs/cgreen
+else
+  cd cgreen
+  git pull
+  cd -
 fi
 cd cgreen
 rm -rf build
