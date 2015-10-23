@@ -15,6 +15,8 @@ option(ECL_BUILD_TESTS "Whether to build tests" OFF)
 option(ECL_ENABLE_COVERAGE "Instrument tests for coverage" OFF)
 option(ECL_WITH_ADDRESS_SANITIZER "Whether to build with address sanitizer enabled" OFF)
 
+find_package(OpenCL)
+
 if(ECL_WITH_ADDRESS_SANITIZER)
   set(OLD_CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS})
   set(CMAKE_REQUIRED_FLAGS "-fsanitize=address")

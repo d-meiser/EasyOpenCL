@@ -16,19 +16,16 @@ for more details.
 You should have received a copy of the GNU General Public License along
 with EasyOpenCL.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include <cgreen/cgreen.h>
-#include <easyOpenCL.h>
+#ifndef EASY_OPENCL_H
+#define EASY_OPENCL_H
 
-Describe(getSomeOpenCLEnvironment);
+#ifdef __APPLE__
+#include <OpenCL/opencl.h>
+#else
+#include <CL/cl.h>
+#endif
 
-BeforeEach(getSomeOpenCLEnvironment) {}
-AfterEach(getSomeOpenCLEnvironment) {}
 
-Ensure(getSomeOpenCLEnvironment, returnsAValidEnvironment) {}
 
-int main() {
-	TestSuite *suite = create_test_suite();
-	add_test_with_context(suite, getSomeOpenCLEnvironment,
-			      returnsAValidEnvironment);
-	return 0;
-}
+#endif
+
