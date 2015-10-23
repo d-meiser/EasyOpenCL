@@ -1,0 +1,27 @@
+sudo: false
+language: c
+cache:
+  apt: true
+  directories:
+  - cgreen
+addons:
+  apt:
+    packages:
+    - cmake
+    - lcov
+before_install:
+  - gem install coveralls-lcov
+  - sh ./utilities/get_cgreen.sh
+script:
+  - mkdir -p build
+  - cd build
+  - cmake -DCGREEN_ROOT_DIR=`pwd`/../cgreen -DECL_BUILD_TESTS=ON -DECL_ENABLE_COVERAGE=ON -DBUILD_SHARED_LIBS=ON  ..
+  - make -j2
+  - ctest -j2 --output-on-failure
+after_success:
+  - lcov -d tests -d src -base-directory .. -c -o coverage.info
+  - lcov --remove coverage.info '/usr/*' -o coverage.info
+  - lcov --remove coverage.info 'cgreen/*' -o coverage.info
+  - lcov --remove coverage.info 'tests/*' -o coverage.info
+  - cd ..
+  - coveralls-lcov build/coverage.info
