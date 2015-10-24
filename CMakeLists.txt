@@ -22,6 +22,9 @@ else ()
   message(STATUS "Using FindEasyOpenCL.cmake")
   find_package(EasyOpenCL)
 endif()
+message(STATUS "OPENCL_FOUND == ${OPENCL_FOUND}")
+message(STATUS "OPENCL_LIB == ${OPENCL_LIB}")
+message(STATUS "OPENCL_INCLUDE_DIR == ${OPENCL_INCLUDE_DIR}")
 
 if(ECL_WITH_ADDRESS_SANITIZER)
   set(OLD_CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS})
@@ -55,6 +58,8 @@ generate_export_header(ecl_lib
     )
 if(ECL_BUILD_TESTS)
   find_package(Cgreen REQUIRED)
+  message(STATUS "CGREEN_LIB == ${CGREEN_LIB}")
+  message(STATUS "CGREEN_INCLUDE_DIR == ${CGREEN_INCLUDE_DIR}")
   add_subdirectory(tests)
 endif()
 
