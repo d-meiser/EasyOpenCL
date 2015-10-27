@@ -20,6 +20,7 @@ with EasyOpenCL.  If not, see <http://www.gnu.org/licenses/>.
 #include <ecl.h>
 
 static struct ecl_context ctx;
+cl_int err;
 
 Describe(eclGetSomeContext)
 
@@ -43,7 +44,6 @@ Ensure(eclGetSomeContext, runs) {
 }
 
 Ensure(eclGetSomeContext, returnsAContextIfNoErrorOccured) {
-	cl_int err;
 	err = eclGetSomeContext(&ctx);
 	if (err == CL_SUCCESS) {
 		assert_that(ctx.context, is_non_null);
@@ -54,8 +54,25 @@ Ensure(eclGetSomeContext, returnsAValidContext) {
 	eclGetSomeContext(&ctx);
 	if (ctx.context) {
 		size_t size;
-		cl_int err = clGetContextInfo(ctx.context,
+		err = clGetContextInfo(ctx.context,
 				CL_CONTEXT_PROPERTIES, 0, 0, &size);
+		assert_that(err, is_equal_to(CL_SUCCESS));
+	}
+}
+
+Ensure(eclGetSomeContext, returnsADeviceIfNoErrorOccured) {
+	err = eclGetSomeContext(&ctx);
+	if (err == CL_SUCCESS) {
+		assert_that(ctx.device, is_non_null);
+	}
+}
+
+Ensure(eclGetSomeContext, returnsAValidDevice) {
+	eclGetSomeContext(&ctx);
+	if (ctx.device) {
+		size_t size;
+		err = clGetDeviceInfo(ctx.device,
+				CL_DEVICE_ENDIAN_LITTLE, 0, 0, &size);
 		assert_that(err, is_equal_to(CL_SUCCESS));
 	}
 }
@@ -67,6 +84,10 @@ int main() {
 			returnsAContextIfNoErrorOccured);
 	add_test_with_context(suite, eclGetSomeContext,
 			returnsAValidContext);
+	add_test_with_context(suite, eclGetSomeContext,
+			returnsADeviceIfNoErrorOccured);
+	add_test_with_context(suite, eclGetSomeContext,
+			returnsAValidDevice);
 	run_test_suite(suite, create_text_reporter());
 	destroy_test_suite(suite);
 	return 0;

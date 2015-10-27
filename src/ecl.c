@@ -48,6 +48,7 @@ cl_int eclGetSomeContext(struct ecl_context *context)
 
 	/* Store context data */
 	context->context = ctx;
+	context->device = device;
 
 	return CL_SUCCESS;
 
