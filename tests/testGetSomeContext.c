@@ -77,6 +77,23 @@ Ensure(eclGetSomeContext, returnsAValidDevice) {
 	}
 }
 
+Ensure(eclGetSomeContext, returnsACommandQueueIfNoErrorOccured) {
+	err = eclGetSomeContext(&ctx);
+	if (err == CL_SUCCESS) {
+		assert_that(ctx.queue, is_non_null);
+	}
+}
+
+Ensure(eclGetSomeContext, returnsAValidCommandQueue) {
+	eclGetSomeContext(&ctx);
+	if (ctx.queue) {
+		size_t size;
+		err = clGetCommandQueueInfo(ctx.queue,
+				CL_QUEUE_PROPERTIES, 0, 0, &size);
+		assert_that(err, is_equal_to(CL_SUCCESS));
+	}
+}
+
 int main() {
 	TestSuite *suite = create_test_suite();
 	add_test_with_context(suite, eclGetSomeContext, runs);
@@ -88,6 +105,10 @@ int main() {
 			returnsADeviceIfNoErrorOccured);
 	add_test_with_context(suite, eclGetSomeContext,
 			returnsAValidDevice);
+	add_test_with_context(suite, eclGetSomeContext,
+			returnsACommandQueueIfNoErrorOccured);
+	add_test_with_context(suite, eclGetSomeContext,
+			returnsAValidCommandQueue);
 	run_test_suite(suite, create_text_reporter());
 	destroy_test_suite(suite);
 	return 0;

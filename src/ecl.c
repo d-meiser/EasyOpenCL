@@ -12,6 +12,7 @@ cl_int eclGetSomeContext(struct ecl_context *context)
 	cl_device_id device;
 	cl_context_properties props[3] = {0};
 	cl_context ctx;
+	cl_command_queue queue;
 
 	/* First get list of available platforms */
 	err = getAllPlatforms(&numPlatforms, &platforms);
@@ -46,9 +47,16 @@ cl_int eclGetSomeContext(struct ecl_context *context)
 		goto cleanup;
 	}
 
-	/* Store context data */
+	/* Then create a command queue */
+	queue = clCreateCommandQueue(ctx, device, 0, &err);
+	if (err != CL_SUCCESS) {
+		goto cleanup;
+	}
+
+	/* Finally store context data */
 	context->context = ctx;
 	context->device = device;
+	context->queue = queue;
 
 	return CL_SUCCESS;
 
