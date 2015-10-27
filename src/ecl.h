@@ -25,7 +25,22 @@ with EasyOpenCL.  If not, see <http://www.gnu.org/licenses/>.
 #include <CL/cl.h>
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
+
+struct ecl_context {
+	cl_context context;
+	cl_device_id device;
+	cl_command_queue queue;
+};
+
+cl_int eclGetSomeContext(struct ecl_context *context);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

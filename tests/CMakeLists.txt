@@ -4,7 +4,10 @@ include_directories(SYSTEM
     ${CGREEN_INCLUDE_DIR}
     )
 
-add_executable(testEasyOpenCL testEasyOpenCL.c)
-target_link_libraries(testEasyOpenCL ${CGREEN_LIB})
-add_test(testEasyOpenCL testEasyOpenCL)
+set(UNIT_TESTS EasyOpenCL GetSomeContext)
+foreach(t ${UNIT_TESTS})
+  add_executable(test${t} test${t}.c)
+  target_link_libraries(test${t} ecl_lib ${CGREEN_LIB} ${OpenCL_LIBRARIES})
+  add_test(test${t} test${t})
+endforeach()
 
