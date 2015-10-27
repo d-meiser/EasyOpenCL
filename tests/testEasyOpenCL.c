@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License along
 with EasyOpenCL.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <cgreen/cgreen.h>
-#include <easyOpenCL.h>
+#include <ecl.h>
 
 Describe(getSomeOpenCLEnvironment);
 

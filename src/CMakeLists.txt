@@ -1,2 +1,2 @@
-add_library(ecl_lib easyOpenCL.c)
+add_library(ecl_lib ecl.c)
 
