@@ -4,6 +4,7 @@ before_install:
   - sudo apt-get install -qq fglrx=2:8.960-0ubuntu1 opencl-headers lcov
   - gem install coveralls-lcov
   - sh ./utilities/get_cgreen.sh
+  - export CGREEN_CHILD_EXIT_WITH_FLUSH=TRUE
 script:
   - mkdir -p build
   - cd build
