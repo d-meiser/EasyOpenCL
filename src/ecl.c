@@ -5,10 +5,16 @@ static cl_int getAllPlatforms(cl_uint *numPlatforms,
 
 cl_int eclGetSomeContext(struct ecl_context *context)
 {
-	/* First get list of available platforms */
+	cl_int err;
 	cl_uint numPlatforms;
 	cl_platform_id *platforms = 0;
-	cl_int err = getAllPlatforms(&numPlatforms, &platforms);
+	cl_uint numDevices;
+	cl_device_id device;
+	cl_context_properties props[3] = {0};
+	cl_context ctx;
+
+	/* First get list of available platforms */
+	err = getAllPlatforms(&numPlatforms, &platforms);
 	if (err != CL_SUCCESS) {
 		return err;
 	}
@@ -18,7 +24,6 @@ cl_int eclGetSomeContext(struct ecl_context *context)
 	}
 
 	/* Then get the list of devices available for the first platform */
-	cl_uint numDevices;
 	err = clGetDeviceIDs(platforms[0], CL_DEVICE_TYPE_ALL, 0, 0,
 			&numDevices);
 	if (err != CL_SUCCESS) {
@@ -28,16 +33,15 @@ cl_int eclGetSomeContext(struct ecl_context *context)
 		err = CL_DEVICE_NOT_FOUND;
 		goto cleanup;
 	}
-	cl_device_id device;
 	err = clGetDeviceIDs(platforms[0], CL_DEVICE_TYPE_ALL, 1, &device, 0);
 	if (err != CL_SUCCESS) {
 		goto cleanup;
 	}
 
 	/* Then create a context with that device */
-	cl_context_properties props[] = {
-	    CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[0], 0};
-	cl_context ctx = clCreateContext(props, 1, &device, 0, 0, &err);
+	props[0] = CL_CONTEXT_PLATFORM;
+	props[1] = (cl_context_properties)platforms[0];
+	ctx = clCreateContext(props, 1, &device, 0, 0, &err);
 	if (err != CL_SUCCESS) {
 		goto cleanup;
 	}
