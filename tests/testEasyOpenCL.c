@@ -29,6 +29,7 @@ Ensure(getSomeOpenCLEnvironment, returnsAValidEnvironment) {}
 int main() {
 	TestSuite *suite = create_test_suite();
 	add_test_with_context(suite, getSomeOpenCLEnvironment,
-			      returnsAValidEnvironment);
+			returnsAValidEnvironment);
+	destroy_test_suite(suite);
 	return 0;
 }
