@@ -1,4 +1,7 @@
-include_directories(${PROJECT_SOURCE_DIR}/src)
+include_directories(
+    ${PROJECT_SOURCE_DIR}/src
+    ${PROJECT_BINARY_DIR}
+    )
 include_directories(SYSTEM 
     ${OpenCL_INCLUDE_DIR}
     ${CGREEN_INCLUDE_DIR}

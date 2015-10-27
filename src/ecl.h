@@ -25,6 +25,9 @@ with EasyOpenCL.  If not, see <http://www.gnu.org/licenses/>.
 #include <CL/cl.h>
 #endif
 
+#include <EclExport.h>
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -36,7 +39,7 @@ struct ecl_context {
 	cl_command_queue queue;
 };
 
-cl_int eclGetSomeContext(struct ecl_context *context);
+ECL_API cl_int eclGetSomeContext(struct ecl_context *context);
 
 #ifdef __cplusplus
 }
