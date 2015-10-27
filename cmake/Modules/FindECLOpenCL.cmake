@@ -1,3 +1,5 @@
+# Try to find OpenCL library and headers.
+#
 # Use OPENCL_ROOT_DIR to specify location of cgreen
 # When successful this defines
 # OPENCL_FOUND
@@ -11,3 +13,6 @@ find_library(OPENCL_LIB OpenCL
 if (OPENCL_INCLUDE_DIR AND OPENCL_LIB)
   set(OPENCL_FOUND TRUE)
 endif ()
+message(STATUS "OPENCL_FOUND == ${OPENCL_FOUND}")
+message(STATUS "OPENCL_LIB == ${OPENCL_LIB}")
+message(STATUS "OPENCL_INCLUDE_DIR == ${OPENCL_INCLUDE_DIR}")
