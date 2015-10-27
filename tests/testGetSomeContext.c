@@ -33,9 +33,6 @@ AfterEach(eclGetSomeContext) {
 	if (ctx.context) {
 		clReleaseContext(ctx.context);
 	}
-	if (ctx.device) {
-		clReleaseDevice(ctx.device);
-	}
 	if (ctx.queue) {
 		clReleaseCommandQueue(ctx.queue);
 	}
