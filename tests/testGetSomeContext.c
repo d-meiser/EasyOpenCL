@@ -29,7 +29,17 @@ BeforeEach(eclGetSomeContext) {
 	ctx.queue = 0;
 }
 
-AfterEach(eclGetSomeContext) {}
+AfterEach(eclGetSomeContext) {
+	if (ctx.context) {
+		clReleaseContext(ctx.context);
+	}
+	if (ctx.device) {
+		clReleaseDevice(ctx.device);
+	}
+	if (ctx.queue) {
+		clReleaseCommandQueue(ctx.queue);
+	}
+}
 
 Ensure(eclGetSomeContext, runs) {
 	eclGetSomeContext(&ctx);
