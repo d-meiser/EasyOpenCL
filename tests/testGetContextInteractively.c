@@ -19,17 +19,39 @@ with EasyOpenCL.  If not, see <http://www.gnu.org/licenses/>.
 #include <cgreen/cgreen.h>
 #include <ecl.h>
 
-Describe(getSomeOpenCLEnvironment)
+static struct ecl_context ctx;
+static cl_int err;
 
-BeforeEach(getSomeOpenCLEnvironment) {}
-AfterEach(getSomeOpenCLEnvironment) {}
+Describe(eclGetContextInteractively)
 
-Ensure(getSomeOpenCLEnvironment, returnsAValidEnvironment) {}
+BeforeEach(eclGetContextInteractively)
+{
+	ctx.context = 0;
+	ctx.device = 0;
+	ctx.queue = 0;
+}
+
+AfterEach(eclGetContextInteractively)
+{
+	if (ctx.context) {
+		clReleaseContext(ctx.context);
+	}
+	if (ctx.queue) {
+		clReleaseCommandQueue(ctx.queue);
+	}
+}
+
+Ensure(eclGetContextInteractively, runs) {
+	err = eclGetContextInteractively(&ctx);
+}
 
 int main() {
+	int err;
 	TestSuite *suite = create_test_suite();
-	add_test_with_context(suite, getSomeOpenCLEnvironment,
-			returnsAValidEnvironment);
+
+	add_test_with_context(suite, eclGetContextInteractively, runs);
+
+	err = run_test_suite(suite, create_text_reporter());
 	destroy_test_suite(suite);
-	return 0;
+	return err;
 }

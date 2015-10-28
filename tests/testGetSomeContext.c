@@ -24,13 +24,15 @@ cl_int err;
 
 Describe(eclGetSomeContext)
 
-BeforeEach(eclGetSomeContext) {
+BeforeEach(eclGetSomeContext)
+{
 	ctx.context = 0;
 	ctx.device = 0;
 	ctx.queue = 0;
 }
 
-AfterEach(eclGetSomeContext) {
+AfterEach(eclGetSomeContext)
+{
 	if (ctx.context) {
 		clReleaseContext(ctx.context);
 	}

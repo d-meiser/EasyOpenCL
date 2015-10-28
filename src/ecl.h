@@ -40,6 +40,7 @@ struct ecl_context {
 };
 
 ECL_API cl_int eclGetSomeContext(struct ecl_context *context);
+ECL_API cl_int eclGetContextInteractively(struct ecl_context *context);
 
 #ifdef __cplusplus
 }

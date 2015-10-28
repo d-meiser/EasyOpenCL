@@ -65,6 +65,12 @@ cleanup:
 	return err;
 }
 
+ECL_API cl_int eclGetContextInteractively(struct ecl_context *context)
+{
+	context->device = 0;
+	return CL_SUCCESS;
+}
+
 cl_int getAllPlatforms(cl_uint *numPlatforms, cl_platform_id **platforms)
 {
 	cl_int err = clGetPlatformIDs(0, 0, numPlatforms);

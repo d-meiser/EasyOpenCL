@@ -7,7 +7,7 @@ include_directories(SYSTEM
     ${CGREEN_INCLUDE_DIR}
     )
 
-set(UNIT_TESTS EasyOpenCL GetSomeContext)
+set(UNIT_TESTS GetSomeContext GetContextInteractively)
 foreach(t ${UNIT_TESTS})
   add_executable(test${t} test${t}.c)
   target_link_libraries(test${t} ecl_lib ${CGREEN_LIB} ${OpenCL_LIBRARIES})
