@@ -1,7 +1,17 @@
 #include <ecl.h>
 
+#include <stdlib.h>
+#include <stdio.h>
+
+#define MAX_BUFFER_SIZE 80
+
 static cl_int getAllPlatforms(cl_uint *numPlatforms,
 			      cl_platform_id **platforms);
+static int NullChooser();
+static int InteractiveChooser();
+
+static EclChoice interactivePlatformChooser = InteractiveChooser;
+static EclChoice interactiveDeviceChooser = InteractiveChooser;
 
 cl_int eclGetSomeContext(struct ecl_context *context)
 {
@@ -13,6 +23,7 @@ cl_int eclGetSomeContext(struct ecl_context *context)
 	cl_context_properties props[3] = {0};
 	cl_context ctx;
 	cl_command_queue queue;
+	int chosenPlatform;
 
 	/* First get list of available platforms */
 	err = getAllPlatforms(&numPlatforms, &platforms);
@@ -25,8 +36,9 @@ cl_int eclGetSomeContext(struct ecl_context *context)
 	}
 
 	/* Then get the list of devices available for the first platform */
-	err = clGetDeviceIDs(platforms[0], CL_DEVICE_TYPE_ALL, 0, 0,
-			&numDevices);
+	chosenPlatform = NullChooser();
+	err = clGetDeviceIDs(platforms[chosenPlatform], CL_DEVICE_TYPE_ALL, 0,
+			0, &numDevices);
 	if (err != CL_SUCCESS) {
 		goto cleanup;
 	}
@@ -34,7 +46,8 @@ cl_int eclGetSomeContext(struct ecl_context *context)
 		err = CL_DEVICE_NOT_FOUND;
 		goto cleanup;
 	}
-	err = clGetDeviceIDs(platforms[0], CL_DEVICE_TYPE_ALL, 1, &device, 0);
+	err = clGetDeviceIDs(platforms[chosenPlatform], CL_DEVICE_TYPE_ALL, 1,
+			&device, 0);
 	if (err != CL_SUCCESS) {
 		goto cleanup;
 	}
@@ -67,8 +80,11 @@ cleanup:
 
 ECL_API cl_int eclGetContextInteractively(struct ecl_context *context)
 {
+	int i;
+	i = interactivePlatformChooser();
+	i = interactiveDeviceChooser();
 	context->device = 0;
-	return CL_SUCCESS;
+	return i;
 }
 
 cl_int getAllPlatforms(cl_uint *numPlatforms, cl_platform_id **platforms)
@@ -82,5 +98,43 @@ cl_int getAllPlatforms(cl_uint *numPlatforms, cl_platform_id **platforms)
 		free(*platforms);
 		*platforms = 0;
 	}
+	return CL_SUCCESS;
+}
+
+static int NullChooser() { return 0; }
+
+static int InteractiveChooser() {
+	int result;
+	int charCount;
+	char buffer[MAX_BUFFER_SIZE];
+	char ch;
+
+	while (1) {
+		ch = getchar();
+		charCount = 0;
+		while ((ch != '\n') && (charCount < MAX_BUFFER_SIZE)) {
+			buffer[charCount++] = ch;
+			ch = getchar();
+		}
+		buffer[charCount] = 0x00;
+		result = atoi(buffer);
+		if (result < 1) {
+			printf("Illegal number entered. Please try again.\n");
+		} else {
+			break;
+		}
+	}
+	return result;
+}
+
+cl_int eclSetPlatformChoice(EclChoice choice)
+{
+	interactivePlatformChooser = choice;
+	return CL_SUCCESS;
+}
+
+cl_int eclSetDeviceChoice(EclChoice choice)
+{
+	interactiveDeviceChooser = choice;
 	return CL_SUCCESS;
 }

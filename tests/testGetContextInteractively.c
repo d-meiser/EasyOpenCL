@@ -22,10 +22,16 @@ with EasyOpenCL.  If not, see <http://www.gnu.org/licenses/>.
 static struct ecl_context ctx;
 static cl_int err;
 
+static int choice = 0;
+
+int mockInteractiveChoice() { return choice; }
+
 Describe(eclGetContextInteractively)
 
 BeforeEach(eclGetContextInteractively)
 {
+	eclSetPlatformChoice(mockInteractiveChoice);
+	eclSetDeviceChoice(mockInteractiveChoice);
 	ctx.context = 0;
 	ctx.device = 0;
 	ctx.queue = 0;
