@@ -121,7 +121,9 @@ Ensure(eclGetSomeContext, commandQueueConsistentWithDevice) {
 }
 
 int main() {
+	int err;
 	TestSuite *suite = create_test_suite();
+
 	add_test_with_context(suite, eclGetSomeContext, runs);
 	add_test_with_context(suite, eclGetSomeContext,
 			returnsAContextIfNoErrorOccured);
@@ -139,7 +141,8 @@ int main() {
 			commandQueueConsistentWithContext);
 	add_test_with_context(suite, eclGetSomeContext,
 			commandQueueConsistentWithDevice);
-	run_test_suite(suite, create_text_reporter());
+
+	err = run_test_suite(suite, create_text_reporter());
 	destroy_test_suite(suite);
-	return 0;
+	return err;
 }
