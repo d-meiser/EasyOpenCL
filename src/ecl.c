@@ -112,10 +112,11 @@ static int InteractiveChooser() {
 	while (1) {
 		ch = getchar();
 		charCount = 0;
-		while ((ch != '\n') && (charCount < MAX_BUFFER_SIZE)) {
+		while ((ch != '\n') && (charCount < MAX_BUFFER_SIZE - 1)) {
 			buffer[charCount++] = ch;
 			ch = getchar();
 		}
+		printf("charcount == %d\n", charCount);
 		buffer[charCount] = 0x00;
 		result = atoi(buffer);
 		if (result < 1) {

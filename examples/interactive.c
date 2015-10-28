@@ -20,5 +20,7 @@ with EasyOpenCL.  If not, see <http://www.gnu.org/licenses/>.
 
 int main()
 {
+  struct ecl_context ctx;
+  eclGetContextInteractively(&ctx);
 	return 0;
 }
