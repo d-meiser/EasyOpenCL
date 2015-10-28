@@ -12,6 +12,7 @@ include(CheckCCompilerFlag)
 include(GenerateExportHeader)
 
 option(ECL_BUILD_TESTS "Whether to build tests" OFF)
+option(ECL_RUN_EXAMPLES_AS_TEST "Whether to run examples as tests" OFF)
 option(ECL_ENABLE_COVERAGE "Instrument tests for coverage" OFF)
 option(ECL_WITH_ADDRESS_SANITIZER "Whether to build with address sanitizer enabled" OFF)
 option(ECL_WITH_PEDANTIC_FLAGS "Whether to compile with pedantic flags." ON)
@@ -64,6 +65,7 @@ generate_export_header(ecl_lib
     BASE_NAME ecl
     EXPORT_MACRO_NAME ECL_API
     )
+add_subdirectory(examples)
 if(ECL_BUILD_TESTS)
   find_package(Cgreen REQUIRED)
   add_subdirectory(tests)
