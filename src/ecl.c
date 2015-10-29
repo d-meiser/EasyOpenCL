@@ -7,8 +7,8 @@
 
 static cl_int getAllPlatforms(cl_uint *numPlatforms,
 			      cl_platform_id **platforms);
-static int NullChooser();
-static int InteractiveChooser();
+static cl_uint NullChooser();
+static cl_uint InteractiveChooser();
 
 static EclChoice interactivePlatformChooser = InteractiveChooser;
 static EclChoice interactiveDeviceChooser = InteractiveChooser;
@@ -54,7 +54,7 @@ cl_int eclGetSomeContext(struct ecl_context *context)
 
 	/* Then create a context with that device */
 	props[0] = CL_CONTEXT_PLATFORM;
-	props[1] = (cl_context_properties)platforms[0];
+	props[1] = (cl_context_properties)platforms[chosenPlatform];
 	ctx = clCreateContext(props, 1, &device, 0, 0, &err);
 	if (err != CL_SUCCESS) {
 		goto cleanup;
@@ -80,11 +80,74 @@ cleanup:
 
 ECL_API cl_int eclGetContextInteractively(struct ecl_context *context)
 {
-	int i;
-	i = interactivePlatformChooser();
-	i = interactiveDeviceChooser();
-	context->device = 0;
-	return i;
+	cl_int err; 
+	cl_uint numPlatforms;
+	cl_uint chosenPlatform;
+	cl_platform_id *platforms = 0;
+	cl_uint numDevices;
+	cl_device_id *devices = 0;
+	cl_uint chosenDevice;
+	cl_context_properties props[3] = {0};
+	cl_context ctx;
+	cl_command_queue queue;
+
+	/* First get list of available platforms */
+	err = getAllPlatforms(&numPlatforms, &platforms);
+	if (err != CL_SUCCESS) {
+		return err;
+	}
+	if (!numPlatforms) {
+		err = CL_INVALID_PLATFORM;
+		goto cleanup;
+	}
+
+	/* choose platform */
+	chosenPlatform = interactivePlatformChooser();
+
+	/* Then get the list of devices available for the chosen platform */
+	err = clGetDeviceIDs(platforms[chosenPlatform], CL_DEVICE_TYPE_ALL, 0,
+			0, &numDevices);
+	if (err != CL_SUCCESS) {
+		goto cleanup;
+	}
+	if (!numDevices) {
+		err = CL_DEVICE_NOT_FOUND;
+		goto cleanup;
+	}
+	devices = malloc(numDevices * sizeof(*devices));
+	err = clGetDeviceIDs(platforms[chosenPlatform], CL_DEVICE_TYPE_ALL,
+			numDevices,
+			devices, 0);
+	if (err != CL_SUCCESS) {
+		goto cleanup;
+	}
+
+	/* choose device */
+	chosenDevice = interactiveDeviceChooser();
+
+	/* Then create a context with that device */
+	props[0] = CL_CONTEXT_PLATFORM;
+	props[1] = (cl_context_properties)platforms[chosenPlatform];
+	ctx = clCreateContext(props, 1, &devices[chosenDevice], 0, 0, &err);
+	if (err != CL_SUCCESS) {
+		goto cleanup;
+	}
+
+	/* Then create a command queue */
+	queue = clCreateCommandQueue(ctx, devices[chosenDevice], 0, &err);
+	if (err != CL_SUCCESS) {
+		goto cleanup;
+	}
+
+	context->context = ctx;
+	context->device = devices[chosenDevice];
+	context->queue = queue;
+
+	return CL_SUCCESS;
+
+cleanup:
+	free(platforms);
+	return err;
 }
 
 cl_int getAllPlatforms(cl_uint *numPlatforms, cl_platform_id **platforms)
@@ -101,9 +164,9 @@ cl_int getAllPlatforms(cl_uint *numPlatforms, cl_platform_id **platforms)
 	return CL_SUCCESS;
 }
 
-static int NullChooser() { return 0; }
+static cl_uint NullChooser() { return 0; }
 
-static int InteractiveChooser() {
+static cl_uint InteractiveChooser() {
 	int result;
 	int charCount;
 	char buffer[MAX_BUFFER_SIZE];

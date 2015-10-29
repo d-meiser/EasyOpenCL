@@ -22,9 +22,9 @@ with EasyOpenCL.  If not, see <http://www.gnu.org/licenses/>.
 static struct ecl_context ctx;
 static cl_int err;
 
-static int choice = 0;
+static cl_uint choice = 0;
 
-int mockInteractiveChoice() { return choice; }
+cl_uint mockInteractiveChoice() { return choice; }
 
 Describe(eclGetContextInteractively)
 
@@ -51,11 +51,20 @@ Ensure(eclGetContextInteractively, runs) {
 	err = eclGetContextInteractively(&ctx);
 }
 
+Ensure(eclGetContextInteractively, returnsAContextIfNoErrorOccured) {
+	err = eclGetContextInteractively(&ctx);
+	if (err == CL_SUCCESS) {
+		assert_that(ctx.context, is_non_null);
+	}
+}
+
 int main() {
 	int err;
 	TestSuite *suite = create_test_suite();
 
 	add_test_with_context(suite, eclGetContextInteractively, runs);
+	add_test_with_context(suite, eclGetContextInteractively,
+			returnsAContextIfNoErrorOccured);
 
 	err = run_test_suite(suite, create_text_reporter());
 	destroy_test_suite(suite);

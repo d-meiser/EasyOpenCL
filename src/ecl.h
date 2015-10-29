@@ -45,7 +45,7 @@ struct ecl_context {
 ECL_API cl_int eclGetSomeContext(struct ecl_context *context);
 ECL_API cl_int eclGetContextInteractively(struct ecl_context *context);
 
-typedef int(*EclChoice)();
+typedef cl_uint(*EclChoice)();
 ECL_API cl_int eclSetPlatformChoice(EclChoice choice);
 ECL_API cl_int eclSetDeviceChoice(EclChoice choice);
 
