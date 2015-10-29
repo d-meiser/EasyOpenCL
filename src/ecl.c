@@ -95,6 +95,10 @@ ECL_API cl_int eclGetContextInteractively(struct ecl_context *context)
 	/* choose platform */
 	printPlatformNames(numPlatforms, platforms);
 	chosenPlatform = interactivePlatformChooser() - 1;
+	if (chosenPlatform >= numPlatforms) {
+		err = CL_INVALID_VALUE;
+		goto cleanup;
+	}
 
 	/* Then get the list of devices available for the chosen platform */
 	err = getAllDevices(platforms[chosenPlatform], &numDevices, &devices);
@@ -104,6 +108,10 @@ ECL_API cl_int eclGetContextInteractively(struct ecl_context *context)
 	err = printDeviceNames(numDevices, devices);
 	if (err != CL_SUCCESS) goto cleanup;
 	chosenDevice = interactiveDeviceChooser() - 1;
+	if (chosenDevice >= numDevices) {
+		err = CL_INVALID_VALUE;
+		goto cleanup;
+	}
 
 	/* Then create a context with that device */
 	props[0] = CL_CONTEXT_PLATFORM;

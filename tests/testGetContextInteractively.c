@@ -30,6 +30,7 @@ Describe(eclGetContextInteractively)
 
 BeforeEach(eclGetContextInteractively)
 {
+	choice = 1;
 	eclSetPlatformChoice(mockInteractiveChoice);
 	eclSetDeviceChoice(mockInteractiveChoice);
 	ctx.context = 0;
@@ -128,6 +129,20 @@ Ensure(eclGetContextInteractively, commandQueueConsistentWithDevice) {
 	assert_that(qDevice, is_equal_to(ctx.device));
 }
 
+Ensure(eclGetContextInteractively, doesntCrashDueToBogusInput) {
+	choice = 10000;
+	err = eclGetContextInteractively(&ctx);
+	assert_that(err, is_equal_to(CL_INVALID_VALUE));
+}
+
+Ensure(eclGetContextInteractively, recoversFromBogusInput) {
+	choice = 10000;
+	eclGetContextInteractively(&ctx);
+	choice = 1;
+	err = eclGetContextInteractively(&ctx);
+	assert_that(err, is_equal_to(CL_SUCCESS));
+}
+
 int main() {
 	int err;
 	TestSuite *suite = create_test_suite();
@@ -149,6 +164,10 @@ int main() {
 			commandQueueConsistentWithContext);
 	add_test_with_context(suite, eclGetContextInteractively,
 			commandQueueConsistentWithDevice);
+	add_test_with_context(suite, eclGetContextInteractively,
+			doesntCrashDueToBogusInput);
+	add_test_with_context(suite, eclGetContextInteractively,
+			recoversFromBogusInput);
 
 	err = run_test_suite(suite, create_text_reporter());
 	destroy_test_suite(suite);
