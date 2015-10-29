@@ -58,6 +58,76 @@ Ensure(eclGetContextInteractively, returnsAContextIfNoErrorOccured) {
 	}
 }
 
+Ensure(eclGetContextInteractively, returnsAValidContext) {
+	eclGetContextInteractively(&ctx);
+	if (ctx.context) {
+		size_t size;
+		err = clGetContextInfo(ctx.context,
+				CL_CONTEXT_PROPERTIES, 0, 0, &size);
+		assert_that(err, is_equal_to(CL_SUCCESS));
+	}
+}
+
+Ensure(eclGetContextInteractively, returnsADeviceIfNoErrorOccured) {
+	err = eclGetContextInteractively(&ctx);
+	if (err == CL_SUCCESS) {
+		assert_that(ctx.device, is_non_null);
+	}
+}
+
+Ensure(eclGetContextInteractively, returnsAValidDevice) {
+	eclGetContextInteractively(&ctx);
+	if (ctx.device) {
+		size_t size;
+		err = clGetDeviceInfo(ctx.device,
+				CL_DEVICE_ENDIAN_LITTLE, 0, 0, &size);
+		assert_that(err, is_equal_to(CL_SUCCESS));
+	}
+}
+
+Ensure(eclGetContextInteractively, returnsACommandQueueIfNoErrorOccured) {
+	err = eclGetContextInteractively(&ctx);
+	if (err == CL_SUCCESS) {
+		assert_that(ctx.queue, is_non_null);
+	}
+}
+
+Ensure(eclGetContextInteractively, returnsAValidCommandQueue) {
+	eclGetContextInteractively(&ctx);
+	if (ctx.queue) {
+		size_t size;
+		err = clGetCommandQueueInfo(ctx.queue,
+				CL_QUEUE_PROPERTIES, 0, 0, &size);
+		assert_that(err, is_equal_to(CL_SUCCESS));
+	}
+}
+
+Ensure(eclGetContextInteractively, commandQueueConsistentWithContext) {
+	size_t size;
+	cl_context qCtx;
+	err = eclGetContextInteractively(&ctx);
+	assert_that(err, is_equal_to(CL_SUCCESS));
+	clGetCommandQueueInfo(ctx.queue, CL_QUEUE_CONTEXT, 0, 0, &size);
+	assert_that(err, is_equal_to(CL_SUCCESS));
+	assert_that(size, is_equal_to(sizeof(qCtx)));
+	clGetCommandQueueInfo(ctx.queue, CL_QUEUE_CONTEXT, size, &qCtx, 0);
+
+	assert_that(qCtx, is_equal_to(ctx.context));
+}
+
+Ensure(eclGetContextInteractively, commandQueueConsistentWithDevice) {
+	size_t size;
+	cl_device_id qDevice;
+	err = eclGetContextInteractively(&ctx);
+	assert_that(err, is_equal_to(CL_SUCCESS));
+	clGetCommandQueueInfo(ctx.queue, CL_QUEUE_DEVICE, 0, 0, &size);
+	assert_that(err, is_equal_to(CL_SUCCESS));
+	assert_that(size, is_equal_to(sizeof(qDevice)));
+	clGetCommandQueueInfo(ctx.queue, CL_QUEUE_DEVICE, size, &qDevice, 0);
+
+	assert_that(qDevice, is_equal_to(ctx.device));
+}
+
 int main() {
 	int err;
 	TestSuite *suite = create_test_suite();
@@ -65,6 +135,20 @@ int main() {
 	add_test_with_context(suite, eclGetContextInteractively, runs);
 	add_test_with_context(suite, eclGetContextInteractively,
 			returnsAContextIfNoErrorOccured);
+	add_test_with_context(suite, eclGetContextInteractively,
+			returnsAValidContext);
+	add_test_with_context(suite, eclGetContextInteractively,
+			returnsADeviceIfNoErrorOccured);
+	add_test_with_context(suite, eclGetContextInteractively,
+			returnsAValidDevice);
+	add_test_with_context(suite, eclGetContextInteractively,
+			returnsACommandQueueIfNoErrorOccured);
+	add_test_with_context(suite, eclGetContextInteractively,
+			returnsAValidCommandQueue);
+	add_test_with_context(suite, eclGetContextInteractively,
+			commandQueueConsistentWithContext);
+	add_test_with_context(suite, eclGetContextInteractively,
+			commandQueueConsistentWithDevice);
 
 	err = run_test_suite(suite, create_text_reporter());
 	destroy_test_suite(suite);
