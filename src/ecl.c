@@ -96,6 +96,8 @@ ECL_API cl_int eclGetContextInteractively(struct ecl_context *context)
 	printPlatformNames(numPlatforms, platforms);
 	chosenPlatform = interactivePlatformChooser() - 1;
 	if (chosenPlatform >= numPlatforms) {
+		printf("Invalid value: %d. Legal values are in [1, %d).\n",
+				chosenPlatform + 1, numPlatforms + 1);
 		err = CL_INVALID_VALUE;
 		goto cleanup;
 	}
@@ -109,6 +111,8 @@ ECL_API cl_int eclGetContextInteractively(struct ecl_context *context)
 	if (err != CL_SUCCESS) goto cleanup;
 	chosenDevice = interactiveDeviceChooser() - 1;
 	if (chosenDevice >= numDevices) {
+		printf("Invalid value: %d. Legal values are in [1, %d).\n",
+				chosenDevice + 1, numDevices + 1);
 		err = CL_INVALID_VALUE;
 		goto cleanup;
 	}
