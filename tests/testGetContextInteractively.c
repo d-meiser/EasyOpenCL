@@ -25,6 +25,7 @@ static cl_int err;
 static cl_uint choice = 1;
 
 cl_uint mockInteractiveChoice() { return choice; }
+cl_uint mockInteractiveChoiceBogus() { return 10000; }
 
 Describe(eclGetContextInteractively)
 
@@ -129,16 +130,30 @@ Ensure(eclGetContextInteractively, commandQueueConsistentWithDevice) {
 	assert_that(qDevice, is_equal_to(ctx.device));
 }
 
-Ensure(eclGetContextInteractively, doesntCrashDueToBogusInput) {
-	choice = 10000;
+Ensure(eclGetContextInteractively, doesntCrashDueToBogusPlatformChoice) {
+	eclSetPlatformChoice(mockInteractiveChoiceBogus);
 	err = eclGetContextInteractively(&ctx);
 	assert_that(err, is_equal_to(CL_INVALID_VALUE));
 }
 
-Ensure(eclGetContextInteractively, recoversFromBogusInput) {
-	choice = 10000;
+Ensure(eclGetContextInteractively, recoversFromBogusPlatformChoice) {
+	eclSetPlatformChoice(mockInteractiveChoiceBogus);
 	eclGetContextInteractively(&ctx);
-	choice = 1;
+	eclSetPlatformChoice(mockInteractiveChoice);
+	err = eclGetContextInteractively(&ctx);
+	assert_that(err, is_equal_to(CL_SUCCESS));
+}
+
+Ensure(eclGetContextInteractively, doesntCrashDueToBogusDeviceChoice) {
+	eclSetDeviceChoice(mockInteractiveChoiceBogus);
+	err = eclGetContextInteractively(&ctx);
+	assert_that(err, is_equal_to(CL_INVALID_VALUE));
+}
+
+Ensure(eclGetContextInteractively, recoversFromBogusDeviceChoice) {
+	eclSetDeviceChoice(mockInteractiveChoiceBogus);
+	eclGetContextInteractively(&ctx);
+	eclSetDeviceChoice(mockInteractiveChoice);
 	err = eclGetContextInteractively(&ctx);
 	assert_that(err, is_equal_to(CL_SUCCESS));
 }
@@ -165,9 +180,13 @@ int main() {
 	add_test_with_context(suite, eclGetContextInteractively,
 			commandQueueConsistentWithDevice);
 	add_test_with_context(suite, eclGetContextInteractively,
-			doesntCrashDueToBogusInput);
+			doesntCrashDueToBogusPlatformChoice);
 	add_test_with_context(suite, eclGetContextInteractively,
-			recoversFromBogusInput);
+			recoversFromBogusPlatformChoice);
+	add_test_with_context(suite, eclGetContextInteractively,
+			doesntCrashDueToBogusDeviceChoice);
+	add_test_with_context(suite, eclGetContextInteractively,
+			recoversFromBogusDeviceChoice);
 
 	err = run_test_suite(suite, create_text_reporter());
 	destroy_test_suite(suite);
