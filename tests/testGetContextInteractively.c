@@ -22,7 +22,7 @@ with EasyOpenCL.  If not, see <http://www.gnu.org/licenses/>.
 static struct ecl_context ctx;
 static cl_int err;
 
-static cl_uint choice = 0;
+static cl_uint choice = 1;
 
 cl_uint mockInteractiveChoice() { return choice; }
 

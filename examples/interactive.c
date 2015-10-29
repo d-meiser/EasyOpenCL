@@ -20,7 +20,13 @@ with EasyOpenCL.  If not, see <http://www.gnu.org/licenses/>.
 
 int main()
 {
-  struct ecl_context ctx;
-  eclGetContextInteractively(&ctx);
-	return 0;
+	struct ecl_context ctx;
+	cl_int err = CL_SUCCESS;
+
+	err = eclGetContextInteractively(&ctx);
+	if (err == CL_SUCCESS) {
+		clReleaseCommandQueue(ctx.queue);
+		clReleaseContext(ctx.context);
+	}
+	return err;
 }

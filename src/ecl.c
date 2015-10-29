@@ -3,11 +3,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define MAX_BUFFER_SIZE 80
+#define MAX_BUFFER_SIZE 1024
 
 static cl_int getAllPlatforms(cl_uint *numPlatforms,
-			      cl_platform_id **platforms);
-static cl_uint NullChooser();
+		cl_platform_id **platforms);
+static cl_int printPlatformNames(cl_uint numPlatforms,
+		cl_platform_id *platforms);
+static cl_int printDeviceNames(cl_uint numDevices, cl_device_id *devices);
+static cl_uint OneChooser();
 static cl_uint InteractiveChooser();
 
 static EclChoice interactivePlatformChooser = InteractiveChooser;
@@ -36,7 +39,7 @@ cl_int eclGetSomeContext(struct ecl_context *context)
 	}
 
 	/* Then get the list of devices available for the first platform */
-	chosenPlatform = NullChooser();
+	chosenPlatform = OneChooser() - 1;
 	err = clGetDeviceIDs(platforms[chosenPlatform], CL_DEVICE_TYPE_ALL, 0,
 			0, &numDevices);
 	if (err != CL_SUCCESS) {
@@ -102,7 +105,8 @@ ECL_API cl_int eclGetContextInteractively(struct ecl_context *context)
 	}
 
 	/* choose platform */
-	chosenPlatform = interactivePlatformChooser();
+	printPlatformNames(numPlatforms, platforms);
+	chosenPlatform = interactivePlatformChooser() - 1;
 
 	/* Then get the list of devices available for the chosen platform */
 	err = clGetDeviceIDs(platforms[chosenPlatform], CL_DEVICE_TYPE_ALL, 0,
@@ -123,7 +127,11 @@ ECL_API cl_int eclGetContextInteractively(struct ecl_context *context)
 	}
 
 	/* choose device */
-	chosenDevice = interactiveDeviceChooser();
+	err = printDeviceNames(numDevices, devices);
+	if (err != CL_SUCCESS) {
+		return err;
+	}
+	chosenDevice = interactiveDeviceChooser() - 1;
 
 	/* Then create a context with that device */
 	props[0] = CL_CONTEXT_PLATFORM;
@@ -143,10 +151,9 @@ ECL_API cl_int eclGetContextInteractively(struct ecl_context *context)
 	context->device = devices[chosenDevice];
 	context->queue = queue;
 
-	return CL_SUCCESS;
-
 cleanup:
 	free(platforms);
+	free(devices);
 	return err;
 }
 
@@ -164,7 +171,7 @@ cl_int getAllPlatforms(cl_uint *numPlatforms, cl_platform_id **platforms)
 	return CL_SUCCESS;
 }
 
-static cl_uint NullChooser() { return 0; }
+static cl_uint OneChooser() { return 1; }
 
 static cl_uint InteractiveChooser() {
 	int result;
@@ -179,7 +186,6 @@ static cl_uint InteractiveChooser() {
 			buffer[charCount++] = ch;
 			ch = getchar();
 		}
-		printf("charcount == %d\n", charCount);
 		buffer[charCount] = 0x00;
 		result = atoi(buffer);
 		if (result < 1) {
@@ -189,6 +195,40 @@ static cl_uint InteractiveChooser() {
 		}
 	}
 	return result;
+}
+
+cl_int printPlatformNames(cl_uint numPlatforms, cl_platform_id *platforms)
+{
+	cl_uint i;
+	cl_int err;
+	char name[MAX_BUFFER_SIZE];
+
+	for (i = 0; i < numPlatforms; ++i) {
+		err = clGetPlatformInfo(platforms[i], CL_PLATFORM_NAME,
+				sizeof(name), name, 0);
+		if (err != CL_SUCCESS) {
+			return err;
+		}
+		printf("[%d] %s\n", i + 1, name);
+	}
+	return CL_SUCCESS;
+}
+
+cl_int printDeviceNames(cl_uint numDevices, cl_device_id *devices)
+{
+	cl_uint i;
+	cl_int err;
+	char name[MAX_BUFFER_SIZE];
+
+	for (i = 0; i < numDevices; ++i) {
+		err = clGetDeviceInfo(devices[i], CL_DEVICE_NAME,
+				sizeof(name), name, 0);
+		if (err != CL_SUCCESS) {
+			return err;
+		}
+		printf("[%d] %s\n", i + 1, name);
+	}
+	return CL_SUCCESS;
 }
 
 cl_int eclSetPlatformChoice(EclChoice choice)
