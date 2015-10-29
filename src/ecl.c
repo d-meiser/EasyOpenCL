@@ -38,32 +38,24 @@ cl_int eclGetSomeContext(struct ecl_context *context)
 	chosenPlatform = OneChooser() - 1;
 	err = clGetDeviceIDs(platforms[chosenPlatform], CL_DEVICE_TYPE_ALL, 0,
 			0, &numDevices);
-	if (err != CL_SUCCESS) {
-		goto cleanup;
-	}
+	if (err != CL_SUCCESS) goto cleanup;
 	if (!numDevices) {
 		err = CL_DEVICE_NOT_FOUND;
 		goto cleanup;
 	}
 	err = clGetDeviceIDs(platforms[chosenPlatform], CL_DEVICE_TYPE_ALL, 1,
 			&device, 0);
-	if (err != CL_SUCCESS) {
-		goto cleanup;
-	}
+	if (err != CL_SUCCESS) goto cleanup;
 
 	/* Then create a context with that device */
 	props[0] = CL_CONTEXT_PLATFORM;
 	props[1] = (cl_context_properties)platforms[chosenPlatform];
 	ctx = clCreateContext(props, 1, &device, 0, 0, &err);
-	if (err != CL_SUCCESS) {
-		goto cleanup;
-	}
+	if (err != CL_SUCCESS) goto cleanup;
 
 	/* Then create a command queue */
 	queue = clCreateCommandQueue(ctx, device, 0, &err);
-	if (err != CL_SUCCESS) {
-		goto cleanup;
-	}
+	if (err != CL_SUCCESS) goto cleanup;
 
 	/* Finally store context data */
 	context->context = ctx;
@@ -198,9 +190,7 @@ cl_int printPlatformNames(cl_uint numPlatforms, cl_platform_id *platforms)
 	for (i = 0; i < numPlatforms; ++i) {
 		err = clGetPlatformInfo(platforms[i], CL_PLATFORM_NAME,
 				sizeof(name), name, 0);
-		if (err != CL_SUCCESS) {
-			return err;
-		}
+		if (err != CL_SUCCESS) return err;
 		printf("[%d] %s\n", i + 1, name);
 	}
 	return CL_SUCCESS;
@@ -215,9 +205,7 @@ cl_int printDeviceNames(cl_uint numDevices, cl_device_id *devices)
 	for (i = 0; i < numDevices; ++i) {
 		err = clGetDeviceInfo(devices[i], CL_DEVICE_NAME,
 				sizeof(name), name, 0);
-		if (err != CL_SUCCESS) {
-			return err;
-		}
+		if (err != CL_SUCCESS) return err;
 		printf("[%d] %s\n", i + 1, name);
 	}
 	return CL_SUCCESS;
