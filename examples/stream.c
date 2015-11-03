@@ -17,18 +17,47 @@ You should have received a copy of the GNU General Public License along
 with EasyOpenCL.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <ecl.h>
+#include <assert.h>
+#include <string.h>
+#include <stdio.h>
+
+const char *src =
+"__kernel void stream(__global const float *a, __global float *b, int n)\n"
+"{\n"
+"        b[get_global_id(0)] = a[get_global_id(0)];\n"
+"}\n"
+;
 
 int main()
 {
 	struct ecl_context ctx;
-	cl_int err = CL_SUCCESS;
+	cl_program program;
+	cl_int err;
+	size_t len;
+	const char *log;
 
 	err = eclGetSomeContext(&ctx);
+	assert(err == CL_SUCCESS);
 
-	if (err == CL_SUCCESS) {
-		clReleaseCommandQueue(ctx.queue);
-		clReleaseContext(ctx.context);
+	len = strlen(src);
+	program = clCreateProgramWithSource(ctx.context, 1, &src, &len, &err);
+	assert(err == CL_SUCCESS);
+
+	err = clBuildProgram(program, 1, &ctx.device, "", 0, 0);
+	if (err != CL_SUCCESS) {
+		err = clGetProgramBuildInfo(program, ctx.device,
+				CL_PROGRAM_BUILD_LOG, 0, 0, &len);
+		log = malloc(len);
+		err = clGetProgramBuildInfo(program, ctx.device,
+				CL_PROGRAM_BUILD_LOG, len, (void*)log, 0);
+		printf("%s\n", log);
 	}
-	return err;
+	assert(err == CL_SUCCESS);
+
+	clReleaseCommandQueue(ctx.queue);
+	clReleaseContext(ctx.context);
+	clReleaseProgram(program);
+
+	return 0;
 }
 
