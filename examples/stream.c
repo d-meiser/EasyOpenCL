@@ -16,6 +16,7 @@ for more details.
 You should have received a copy of the GNU General Public License along
 with EasyOpenCL.  If not, see <http://www.gnu.org/licenses/>.
 */
+#define CL_USE_DEPRECATED_OPENCL_1_0_APIS 1
 #include <ecl.h>
 #include <assert.h>
 #include <string.h>
@@ -32,9 +33,14 @@ int main()
 {
 	struct ecl_context ctx;
 	cl_program program;
+	cl_kernel kernel;
 	cl_int err;
-	size_t len;
+	cl_mem in, out;
+	size_t len, globWorkSize;
 	const char *log;
+	int n = 1000000;
+	cl_event event;
+	cl_ulong start, end;
 
 	err = eclGetSomeContext(&ctx);
 	assert(err == CL_SUCCESS);
@@ -53,10 +59,43 @@ int main()
 		printf("%s\n", log);
 	}
 	assert(err == CL_SUCCESS);
+	kernel = clCreateKernel(program, "stream", &err);
+	assert(err == CL_SUCCESS);
+
+	in = clCreateBuffer(ctx.context, CL_MEM_READ_ONLY, n * sizeof(float),
+			0, &err);
+	assert(err == CL_SUCCESS);
+	out = clCreateBuffer(ctx.context, CL_MEM_READ_ONLY, n * sizeof(float),
+			0, &err);
+	assert(err == CL_SUCCESS);
+
+	err = clSetKernelArg(kernel, 0, sizeof(in), &in);
+	assert(err == CL_SUCCESS);
+	err = clSetKernelArg(kernel, 1, sizeof(out), &out);
+	assert(err == CL_SUCCESS);
+	err = clSetKernelArg(kernel, 2, sizeof(n), &n);
+	assert(err == CL_SUCCESS);
+
+	globWorkSize = n;
+	err = clEnqueueNDRangeKernel(ctx.queue, kernel, 1, 0, &globWorkSize, 0,
+			0, 0, &event);
+	assert(err == CL_SUCCESS);
+	clWaitForEvents(1, &event);
+	clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_START,
+			sizeof(start), &start, 0);
+	assert(err == CL_SUCCESS);
+	clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_END,
+			sizeof(end), &end, 0);
+	assert(err == CL_SUCCESS);
+	printf("%ld %ld\n", start, end);
 
 	clReleaseCommandQueue(ctx.queue);
 	clReleaseContext(ctx.context);
 	clReleaseProgram(program);
+	clReleaseKernel(kernel);
+	clReleaseMemObject(in);
+	clReleaseMemObject(out);
+	clReleaseEvent(event);
 
 	return 0;
 }
