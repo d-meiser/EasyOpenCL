@@ -54,7 +54,8 @@ cl_int eclGetSomeContext(struct ecl_context *context)
 	if (err != CL_SUCCESS) goto cleanup;
 
 	/* Then create a command queue */
-	queue = clCreateCommandQueue(ctx, device, 0, &err);
+	queue = clCreateCommandQueue(ctx, device, CL_QUEUE_PROFILING_ENABLE,
+			&err);
 	if (err != CL_SUCCESS) goto cleanup;
 
 	/* Finally store context data */
@@ -116,7 +117,8 @@ ECL_API cl_int eclGetContextInteractively(struct ecl_context *context)
 	if (err != CL_SUCCESS) goto cleanup;
 
 	/* Then create a command queue */
-	queue = clCreateCommandQueue(ctx, devices[chosenDevice], 0, &err);
+	queue = clCreateCommandQueue(ctx, devices[chosenDevice],
+			CL_QUEUE_PROFILING_ENABLE, &err);
 	if (err != CL_SUCCESS) goto cleanup;
 
 	context->context = ctx;
