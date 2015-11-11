@@ -38,7 +38,7 @@ int main()
 	cl_mem in, out;
 	size_t len, globWorkSize;
 	const char *log;
-	int n = 1000000;
+	int n = 100000;
 	cl_event event;
 	cl_ulong start, end;
 
@@ -81,13 +81,27 @@ int main()
 			0, 0, &event);
 	assert(err == CL_SUCCESS);
 	clWaitForEvents(1, &event);
-	clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_START,
+	err = clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_START,
 			sizeof(start), &start, 0);
-	assert(err == CL_SUCCESS);
-	clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_END,
+	if (err == CL_PROFILING_INFO_NOT_AVAILABLE) {
+		printf("Profling info not available.\n");
+		return err;
+	} else if (err) {
+		printf("An error occurred getting profiling info.\n");
+		return err;
+	}
+	err = clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_END,
 			sizeof(end), &end, 0);
-	assert(err == CL_SUCCESS);
-	printf("%ld %ld\n", start, end);
+	if (err == CL_PROFILING_INFO_NOT_AVAILABLE) {
+		printf("Profling info not available.\n");
+		return err;
+	} else if (err) {
+		printf("An error occurred getting profiling info.\n");
+		return err;
+	}
+	printf("T/ms: %lf\n", (double)(end - start) / 1.0e6);
+	printf("MB:   %lf\n", (double)n * sizeof(float) / 1.0e6);
+	printf("GB/s: %lf\n", (double)n * sizeof(float) / (end - start));
 
 	clReleaseCommandQueue(ctx.queue);
 	clReleaseContext(ctx.context);
@@ -97,6 +111,6 @@ int main()
 	clReleaseMemObject(out);
 	clReleaseEvent(event);
 
-	return 0;
+	return err;
 }
 
