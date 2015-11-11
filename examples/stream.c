@@ -16,7 +16,6 @@ for more details.
 You should have received a copy of the GNU General Public License along
 with EasyOpenCL.  If not, see <http://www.gnu.org/licenses/>.
 */
-#define CL_USE_DEPRECATED_OPENCL_1_0_APIS 1
 #include <ecl.h>
 #include <assert.h>
 #include <string.h>
