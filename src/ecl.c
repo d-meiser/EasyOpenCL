@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #define MAX_BUFFER_SIZE 1024
 
@@ -133,6 +134,33 @@ ECL_API cl_int eclGetContextInteractively(struct ecl_context *context)
 cleanup:
 	free(platforms);
 	free(devices);
+	return err;
+}
+
+ECL_API cl_int eclGetProgramFromSource(cl_context context, cl_device_id device,
+		const char *source, cl_program *program)
+{
+	cl_int err = CL_SUCCESS;
+	size_t len;
+	cl_program prog;
+
+	len = strlen(source);
+	prog = clCreateProgramWithSource(context, 1, &source, &len, &err);
+	if (err != CL_SUCCESS) return err;
+
+	err = clBuildProgram(prog, 1, &device, "", 0, 0);
+	if (err != CL_SUCCESS) {
+		const char *log;
+		err = clGetProgramBuildInfo(prog, device,
+				CL_PROGRAM_BUILD_LOG, 0, 0, &len);
+		log = malloc(len);
+		err = clGetProgramBuildInfo(prog, device,
+				CL_PROGRAM_BUILD_LOG, len, (void*)log, 0);
+		printf("%s\n", log);
+		return err;
+	}
+	*program = prog;
+
 	return err;
 }
 

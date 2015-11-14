@@ -43,6 +43,8 @@ struct ecl_context {
 
 ECL_API cl_int eclGetSomeContext(struct ecl_context *context);
 ECL_API cl_int eclGetContextInteractively(struct ecl_context *context);
+ECL_API cl_int eclGetProgramFromSource(cl_context context, cl_device_id device,
+		const char *source, cl_program *program);
 
 typedef cl_uint(*EclChoice)();
 ECL_API cl_int eclSetPlatformChoice(EclChoice choice);

@@ -18,7 +18,6 @@ with EasyOpenCL.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <ecl.h>
 #include <assert.h>
-#include <string.h>
 #include <stdio.h>
 
 const char *src =
@@ -35,8 +34,7 @@ int main()
 	cl_kernel kernel;
 	cl_int err;
 	cl_mem in, out;
-	size_t len, globWorkSize;
-	const char *log;
+	size_t globWorkSize;
 	int n = 100000;
 	cl_event event;
 	cl_ulong start, end;
@@ -44,20 +42,9 @@ int main()
 	err = eclGetSomeContext(&ctx);
 	assert(err == CL_SUCCESS);
 
-	len = strlen(src);
-	program = clCreateProgramWithSource(ctx.context, 1, &src, &len, &err);
+	err = eclGetProgramFromSource(ctx.context, ctx.device, src, &program);
 	assert(err == CL_SUCCESS);
 
-	err = clBuildProgram(program, 1, &ctx.device, "", 0, 0);
-	if (err != CL_SUCCESS) {
-		err = clGetProgramBuildInfo(program, ctx.device,
-				CL_PROGRAM_BUILD_LOG, 0, 0, &len);
-		log = malloc(len);
-		err = clGetProgramBuildInfo(program, ctx.device,
-				CL_PROGRAM_BUILD_LOG, len, (void*)log, 0);
-		printf("%s\n", log);
-	}
-	assert(err == CL_SUCCESS);
 	kernel = clCreateKernel(program, "stream", &err);
 	assert(err == CL_SUCCESS);
 
