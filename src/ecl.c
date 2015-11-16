@@ -169,11 +169,11 @@ ECL_API cl_int eclGetProgramFromSource(cl_context context, cl_device_id device,
 	err = clBuildProgram(prog, 1, &device, "", 0, 0);
 	if (err != CL_SUCCESS) {
 		const char *log;
-		err = clGetProgramBuildInfo(prog, device,
-				CL_PROGRAM_BUILD_LOG, 0, 0, &len);
+		clGetProgramBuildInfo(prog, device, CL_PROGRAM_BUILD_LOG, 0, 0,
+				&len);
 		log = malloc(len);
-		err = clGetProgramBuildInfo(prog, device,
-				CL_PROGRAM_BUILD_LOG, len, (void*)log, 0);
+		clGetProgramBuildInfo(prog, device, CL_PROGRAM_BUILD_LOG, len,
+				(void*)log, 0);
 		printf("%s\n", log);
 		return err;
 	}

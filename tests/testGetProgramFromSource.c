@@ -26,9 +26,8 @@ Describe(eclGetProgramFromSource)
 
 BeforeEach(eclGetProgramFromSource)
 {
-	ctx.context = 0;
-	ctx.device = 0;
-	ctx.queue = 0;
+	err = eclGetSomeContext(&ctx);
+	assert_that(err, is_equal_to(CL_SUCCESS));
 }
 
 AfterEach(eclGetProgramFromSource)
@@ -42,7 +41,10 @@ AfterEach(eclGetProgramFromSource)
 }
 
 Ensure(eclGetProgramFromSource, failsWhenGivenBogusSource) {
-	eclGetSomeContext(&ctx);
+	cl_program prg;
+	err = eclGetProgramFromSource(ctx.context, ctx.device,
+			"Some source code with bugs", &prg);
+	assert_that(err, is_not_equal_to(CL_SUCCESS));
 }
 
 int main() {
