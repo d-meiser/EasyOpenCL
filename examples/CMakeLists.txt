@@ -13,8 +13,15 @@ file(COPY
     sampleBadPlatform.txt
     sampleBadDevice.txt
     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-add_executable(interactive interactive.c)
-target_link_libraries(interactive ecl_lib ${OpenCL_LIBRARIES})
+
+set(EXAMPLES interactive stream)
+
+foreach(e ${EXAMPLES})
+  add_executable(${e} ${e}.c)
+  target_link_libraries(${e} ecl_lib ${OpenCL_LIBRARIES})
+endforeach()
+
 if(ECL_RUN_EXAMPLES_AS_TEST)
   add_test(interactive sh runInteractive.sh)
+  add_test(stream stream)
 endif()

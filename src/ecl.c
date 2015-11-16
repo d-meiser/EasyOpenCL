@@ -1,7 +1,26 @@
+/*
+Copyright 2014 Dominic Meiser
+
+This file is part of EasyOpenCL.
+
+mbo is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+mbo is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License along
+with EasyOpenCL.  If not, see <http://www.gnu.org/licenses/>.
+*/
 #include <ecl.h>
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #define MAX_BUFFER_SIZE 1024
 
@@ -54,8 +73,14 @@ cl_int eclGetSomeContext(struct ecl_context *context)
 	if (err != CL_SUCCESS) goto cleanup;
 
 	/* Then create a command queue */
-	queue = clCreateCommandQueue(ctx, device, 0, &err);
-	if (err != CL_SUCCESS) goto cleanup;
+	queue = clCreateCommandQueue(ctx, device, CL_QUEUE_PROFILING_ENABLE,
+			&err);
+	if (err != CL_SUCCESS) {
+		queue = clCreateCommandQueue(ctx, device, 0, &err);
+		if (err != CL_SUCCESS) {
+			goto cleanup;
+		}
+	}
 
 	/* Finally store context data */
 	context->context = ctx;
@@ -116,7 +141,8 @@ ECL_API cl_int eclGetContextInteractively(struct ecl_context *context)
 	if (err != CL_SUCCESS) goto cleanup;
 
 	/* Then create a command queue */
-	queue = clCreateCommandQueue(ctx, devices[chosenDevice], 0, &err);
+	queue = clCreateCommandQueue(ctx, devices[chosenDevice],
+			CL_QUEUE_PROFILING_ENABLE, &err);
 	if (err != CL_SUCCESS) goto cleanup;
 
 	context->context = ctx;
@@ -126,6 +152,33 @@ ECL_API cl_int eclGetContextInteractively(struct ecl_context *context)
 cleanup:
 	free(platforms);
 	free(devices);
+	return err;
+}
+
+ECL_API cl_int eclGetProgramFromSource(cl_context context, cl_device_id device,
+		const char *source, cl_program *program)
+{
+	cl_int err = CL_SUCCESS;
+	size_t len;
+	cl_program prog;
+
+	len = strlen(source);
+	prog = clCreateProgramWithSource(context, 1, &source, &len, &err);
+	if (err != CL_SUCCESS) return err;
+
+	err = clBuildProgram(prog, 1, &device, "", 0, 0);
+	if (err != CL_SUCCESS) {
+		const char *log;
+		clGetProgramBuildInfo(prog, device, CL_PROGRAM_BUILD_LOG, 0, 0,
+				&len);
+		log = malloc(len);
+		clGetProgramBuildInfo(prog, device, CL_PROGRAM_BUILD_LOG, len,
+				(void*)log, 0);
+		printf("%s\n", log);
+		return err;
+	}
+	*program = prog;
+
 	return err;
 }
 
