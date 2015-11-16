@@ -21,6 +21,12 @@ with EasyOpenCL.  If not, see <http://www.gnu.org/licenses/>.
 
 static struct ecl_context ctx;
 cl_int err;
+static const char src[] =
+"__kernel void stream(__global const float *a, __global float *b, int n)\n"
+"{\n"
+"        b[get_global_id(0)] = a[get_global_id(0)];\n"
+"}\n"
+;
 
 Describe(eclGetProgramFromSource)
 
@@ -47,12 +53,28 @@ Ensure(eclGetProgramFromSource, failsWhenGivenBogusSource) {
 	assert_that(err, is_not_equal_to(CL_SUCCESS));
 }
 
+Ensure(eclGetProgramFromSource, failsWhenGivenBadContext) {
+	cl_program prg;
+	err = eclGetProgramFromSource(0, ctx.device, src, &prg);
+	assert_that(err, is_not_equal_to(CL_SUCCESS));
+}
+
+Ensure(eclGetProgramFromSource, worksForReasonableSource) {
+	cl_program prg;
+	err = eclGetProgramFromSource(ctx.context, ctx.device, src, &prg);
+	assert_that(err, is_equal_to(CL_SUCCESS));
+}
+
 int main() {
 	int err;
 	TestSuite *suite = create_test_suite();
 
 	add_test_with_context(suite, eclGetProgramFromSource,
 			failsWhenGivenBogusSource);
+	add_test_with_context(suite, eclGetProgramFromSource,
+			failsWhenGivenBadContext);
+	add_test_with_context(suite, eclGetProgramFromSource,
+			worksForReasonableSource);
 
 	err = run_test_suite(suite, create_text_reporter());
 	destroy_test_suite(suite);
