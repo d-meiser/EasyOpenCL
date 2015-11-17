@@ -45,6 +45,13 @@ ECL_API cl_int eclGetSomeContext(struct ecl_context *context);
 ECL_API cl_int eclGetContextInteractively(struct ecl_context *context);
 ECL_API cl_int eclGetProgramFromSource(cl_context context, cl_device_id device,
 		const char *source, cl_program *program);
+ECL_API cl_int eclGetProgramFromFile(cl_context context, cl_device_id device,
+		const char *fileName, cl_program *program);
+
+
+/* Error codes */
+#define ECL_INVALID_FILE 1
+
 
 typedef cl_uint(*EclChoice)();
 ECL_API cl_int eclSetPlatformChoice(EclChoice choice);

@@ -182,6 +182,33 @@ ECL_API cl_int eclGetProgramFromSource(cl_context context, cl_device_id device,
 	return err;
 }
 
+ECL_API cl_int eclGetProgramFromFile(cl_context context, cl_device_id device,
+		const char *fileName, cl_program *program)
+{
+
+	FILE *f;
+	char *source;
+	int err;
+	size_t sourceSize, errS;
+
+	f = fopen(fileName, "r");
+	if (!f) return ECL_INVALID_FILE;
+	err = fseek(f, 0, SEEK_END);
+	if (err) return ECL_INVALID_FILE;
+	sourceSize = ftell(f);
+	err = fseek(f, 0, SEEK_SET);
+	if (err) return ECL_INVALID_FILE;
+	source = malloc(sourceSize + 1);
+	if (!source) return CL_OUT_OF_HOST_MEMORY;
+	errS = fread(source, 1, sourceSize, f);
+	if (errS != sourceSize) return ECL_INVALID_FILE;
+	source[sourceSize] = 0;
+	fclose(f);
+	err = eclGetProgramFromSource(context, device, source, program);
+	free(source);
+	return err;
+}
+
 cl_int getAllPlatforms(cl_uint *numPlatforms, cl_platform_id **platforms)
 {
 	cl_int err;

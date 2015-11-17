@@ -10,6 +10,7 @@ include_directories(SYSTEM
 set(UNIT_TESTS
     GetSomeContext
     GetContextInteractively
+    GetProgramFromFile
     GetProgramFromSource)
 
 foreach(t ${UNIT_TESTS})
@@ -17,4 +18,9 @@ foreach(t ${UNIT_TESTS})
   target_link_libraries(test${t} ecl_lib ${CGREEN_LIB} ${OpenCL_LIBRARIES})
   add_test(test${t} test${t})
 endforeach()
+
+file(COPY
+    streamKernel.cl
+    bogusKernel.cl
+    DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
