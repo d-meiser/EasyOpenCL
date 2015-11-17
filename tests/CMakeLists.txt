@@ -18,3 +18,7 @@ foreach(t ${UNIT_TESTS})
   add_test(test${t} test${t})
 endforeach()
 
+file(COPY
+    streamKernel.cl
+    DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
