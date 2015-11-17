@@ -21,5 +21,6 @@ endforeach()
 
 file(COPY
     streamKernel.cl
+    bogusKernel.cl
     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 

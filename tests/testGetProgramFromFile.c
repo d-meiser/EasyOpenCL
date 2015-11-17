@@ -47,6 +47,13 @@ Ensure(eclGetProgramFromFile, failsWhenFileDoesNotExist) {
 	assert_that(err, is_not_equal_to(CL_SUCCESS));
 }
 
+Ensure(eclGetProgramFromFile, failsForFileWithSyntaxErrors) {
+	cl_program prg;
+	err = eclGetProgramFromFile(ctx.context, ctx.device,
+			"bogusKernel.cl", &prg);
+	assert_that(err, is_not_equal_to(CL_SUCCESS));
+}
+
 Ensure(eclGetProgramFromFile, worksForAReasonableFile) {
 	cl_program prg;
 	err = eclGetProgramFromFile(ctx.context, ctx.device,
@@ -60,6 +67,8 @@ int main() {
 
 	add_test_with_context(suite, eclGetProgramFromFile,
 			failsWhenFileDoesNotExist);
+	add_test_with_context(suite, eclGetProgramFromFile,
+			failsForFileWithSyntaxErrors);
 	add_test_with_context(suite, eclGetProgramFromFile,
 			worksForAReasonableFile);
 
