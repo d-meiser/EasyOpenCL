@@ -47,12 +47,21 @@ Ensure(eclGetProgramFromFile, failsWhenFileDoesNotExist) {
 	assert_that(err, is_not_equal_to(CL_SUCCESS));
 }
 
+Ensure(eclGetProgramFromFile, worksForAReasonableFile) {
+	cl_program prg;
+	err = eclGetProgramFromFile(ctx.context, ctx.device,
+			"streamKernel.cl", &prg);
+	assert_that(err, is_equal_to(CL_SUCCESS));
+}
+
 int main() {
 	int err;
 	TestSuite *suite = create_test_suite();
 
 	add_test_with_context(suite, eclGetProgramFromFile,
 			failsWhenFileDoesNotExist);
+	add_test_with_context(suite, eclGetProgramFromFile,
+			worksForAReasonableFile);
 
 	err = run_test_suite(suite, create_text_reporter());
 	destroy_test_suite(suite);
