@@ -10,6 +10,7 @@ include_directories(SYSTEM
 set(UNIT_TESTS
     GetSomeContext
     GetContextInteractively
+    GetProgramFromFile
     GetProgramFromSource)
 
 foreach(t ${UNIT_TESTS})

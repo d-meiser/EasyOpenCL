@@ -182,6 +182,12 @@ ECL_API cl_int eclGetProgramFromSource(cl_context context, cl_device_id device,
 	return err;
 }
 
+ECL_API cl_int eclGetProgramFromFile(cl_context context, cl_device_id device,
+		const char *fileName, cl_program *program)
+{
+	return eclGetProgramFromSource(context, device, fileName, program);
+}
+
 cl_int getAllPlatforms(cl_uint *numPlatforms, cl_platform_id **platforms)
 {
 	cl_int err;
