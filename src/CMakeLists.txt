@@ -8,4 +8,5 @@ include_directories(SYSTEM
     )
 
 add_library(ecl_lib ecl.c)
+set_target_properties(ecl_lib PROPERTIES DEFINE_SYMBOL BUILDING_ECL)
 
