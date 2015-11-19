@@ -92,7 +92,7 @@ cleanup:
 	return err;
 }
 
-ECL_API cl_int eclGetContextInteractively(struct ecl_context *context)
+cl_int eclGetContextInteractively(struct ecl_context *context)
 {
 	cl_int err; 
 	cl_uint numPlatforms;
@@ -155,7 +155,7 @@ cleanup:
 	return err;
 }
 
-ECL_API cl_int eclGetProgramFromSource(cl_context context, cl_device_id device,
+cl_int eclGetProgramFromSource(cl_context context, cl_device_id device,
 		const char *source, cl_program *program)
 {
 	cl_int err = CL_SUCCESS;
@@ -182,7 +182,7 @@ ECL_API cl_int eclGetProgramFromSource(cl_context context, cl_device_id device,
 	return err;
 }
 
-ECL_API cl_int eclGetProgramFromFile(cl_context context, cl_device_id device,
+cl_int eclGetProgramFromFile(cl_context context, cl_device_id device,
 		const char *fileName, cl_program *program)
 {
 
