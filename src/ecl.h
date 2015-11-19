@@ -27,8 +27,17 @@ with EasyOpenCL.  If not, see <http://www.gnu.org/licenses/>.
 #include <CL/cl.h>
 #endif
 
-#include <EclExport.h>
-
+#ifdef _MSC_VER
+#  ifdef BUILDING_ECL
+#    define ECL_API __declspec(dllexport)
+#  else
+#    define ECL_API __declspec(dllimport)
+#  endif
+#elif __GNUC__ >= 4 || defined(__clang__)
+#  define ECL_API __attribute__((visibility ("default")))
+#else
+#  define ECL_API
+#endif
 
 #ifdef __cplusplus
 extern "C" {

@@ -9,7 +9,6 @@ set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
 enable_testing()
 include(CheckCCompilerFlag)
-include(GenerateExportHeader)
 
 option(ECL_BUILD_TESTS "Whether to build tests" OFF)
 option(ECL_RUN_EXAMPLES_AS_TEST "Whether to run examples as tests" OFF)
@@ -60,11 +59,6 @@ endif()
 
 
 add_subdirectory(src)
-generate_export_header(ecl_lib
-    EXPORT_FILE_NAME EclExport.h
-    BASE_NAME ecl
-    EXPORT_MACRO_NAME ECL_API
-    )
 add_subdirectory(examples)
 if(ECL_BUILD_TESTS)
   find_package(Cgreen REQUIRED)
