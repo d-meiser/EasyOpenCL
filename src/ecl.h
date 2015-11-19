@@ -19,8 +19,6 @@ with EasyOpenCL.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef EASY_OPENCL_H
 #define EASY_OPENCL_H
 
-/* Need this because we want to use clCreateCommandQueue across all
-   versions of OpenCL. */
 #ifdef __APPLE__
 #include <OpenCL/opencl.h>
 #else
